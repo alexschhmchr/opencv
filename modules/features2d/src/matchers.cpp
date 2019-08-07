@@ -672,8 +672,9 @@ void DescriptorMatcher::radiusMatch( InputArray queryDescriptors, std::vector<st
     radiusMatchImpl( queryDescriptors, matches, maxDistance, masks, compactResult );
 }
 
-void DescriptorMatcher::read( const FileNode& )
-{}
+void DescriptorMatcher::read( const FileNode &fn) {
+    
+}
 
 void DescriptorMatcher::write( FileStorage& ) const
 {}
@@ -723,6 +724,30 @@ Ptr<DescriptorMatcher> BFMatcher::clone( bool emptyTrainData ) const
                         matcher->trainDescCollection.begin(), clone_op );
     }
     return matcher;
+}
+
+void BFMatcher::write(FileStorage &fs) const {
+    fs << "normType" << normType;
+    fs << "crossCheck" << crossCheck;
+    fs << "train_desc" << "[";
+    std::for_each(trainDescCollection.begin(), trainDescCollection.end(), [&fs](cv::Mat trainDesc) {
+        fs << trainDesc;
+    });
+    fs << "]";
+}
+
+void BFMatcher::read(const FileNode& fn) {
+    fn["normType"] >> normType;
+    fn["crossCheck"] >> crossCheck;
+    fn["train_desc"] >> trainDescCollection;
+}
+
+Ptr<BFMatcher> BFMatcher::load(const String& filename) {
+    Ptr<BFMatcher> bfMatcher = BFMatcher::create();
+    FileStorage fs = FileStorage(filename, FileStorage::READ);
+    bfMatcher->read(fs.getFirstTopLevelNode());
+    fs.release();
+    return bfMatcher;
 }
 
 #ifdef HAVE_OPENCL

@@ -1130,6 +1130,12 @@ public:
     CV_WRAP static Ptr<BFMatcher> create( int normType=NORM_L2, bool crossCheck=false ) ;
 
     virtual Ptr<DescriptorMatcher> clone( bool emptyTrainData=false ) const CV_OVERRIDE;
+
+    virtual void write(FileStorage&) const CV_OVERRIDE;
+
+    virtual void read(const FileNode&) CV_OVERRIDE;
+
+    CV_WRAP static Ptr<BFMatcher> load(const String& filepath);
 protected:
     virtual void knnMatchImpl( InputArray queryDescriptors, std::vector<std::vector<DMatch> >& matches, int k,
         InputArrayOfArrays masks=noArray(), bool compactResult=false ) CV_OVERRIDE;
